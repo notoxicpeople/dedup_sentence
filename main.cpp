@@ -9,27 +9,28 @@
 #include "simdjson.h"
 #include <thread>
 #include <mutex>
+#include <algorithm>
+#include <numeric>
 
 using namespace simdjson;
 namespace fs = std::experimental::filesystem;
 
 std::mutex hashMutex;
 
-void processFile(const std::string &filePath, const std::string &outputDir, std::unordered_set<std::string> &processedHashes){
+void processFile(const std::string &filePath, const std::string &outputDir, std::unordered_set<std::string> &processedHashes) {
     std::string outputFileName = outputDir + "/" + fs::path(filePath).filename().string();
 
-    // Skip processing if output file already exists
     if (fs::exists(outputFileName)) {
         std::cout << "Skipping already processed file: " << filePath << std::endl;
         return;
     }
 
-    std::cout << "\nProcessing file: " << filePath << std::endl;    
+    std::cout << "\nProcessing file: " << filePath << std::endl;
     Hasher hasher(5, 100, 10, 10);
     std::vector<std::string> outputLines;
 
     ondemand::parser parser;
-    padded_string json = padded_string::load(filePath);    
+    padded_string json = padded_string::load(filePath);
     ondemand::document_stream docs = parser.iterate_many(json);
     size_t duplicatedCount = 0;
     int i = 0;
@@ -80,11 +81,25 @@ void processFile(const std::string &filePath, const std::string &outputDir, std:
     outFile.close();
 }
 
-void processFiles(const std::string &inputDir, const std::string &outputDir){
-    std::unordered_set<std::string> processedHashes;
+void processFiles(const std::string &inputDir, const std::string &outputDir, int numThreads) {
     std::vector<std::thread> threads;
+    std::vector<std::string> filePaths;
     for (const auto &file : fs::directory_iterator(inputDir)) {
-        threads.emplace_back(processFile, file.path().string(), outputDir, std::ref(processedHashes));
+        filePaths.push_back(file.path().string());
+    }
+
+    std::unordered_set<std::string> processedHashes;
+    size_t perThread = filePaths.size() / numThreads;
+    auto it = filePaths.begin();
+
+    for (int i = 0; i < numThreads; ++i) {
+        auto end = (i == numThreads - 1) ? filePaths.end() : it + perThread;
+        threads.emplace_back([=, &processedHashes]() {
+            for (auto iter = it; iter != end; ++iter) {
+                processFile(*iter, outputDir, processedHashes);
+            }
+        });
+        it += perThread;
     }
 
     for (auto &t : threads) {
@@ -92,15 +107,18 @@ void processFiles(const std::string &inputDir, const std::string &outputDir){
     }
 }
 
-int main(int argc, char *argv[]){    
-    if (argc < 3){
-        std::cerr << "Usage: " << argv[0] << " <input directory> <output directory>" << std::endl;
+int main(int argc, char *argv[]) {
+    if (argc < 4) {
+        std::cerr << "Usage: " << argv[0] << " <input directory> <output directory> <num threads>" << std::endl;
         return 1;
     }
 
     std::string inputDir = argv[1];
     std::string outputDir = argv[2];
+    int numThreads = std::stoi(argv[3]);
 
-    processFiles(inputDir, outputDir);
+    std::cout << "Starting processing with " << numThreads << " threads..." << std::endl;
+    processFiles(inputDir, outputDir, numThreads);
+    std::cout << "Processing completed." << std::endl;
     return 0;
 }
