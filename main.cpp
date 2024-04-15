@@ -66,11 +66,11 @@ void processFile(const std::string &filePath, const std::string &outputDir, std:
             }
         }
         if (i % 5000 == 0) {
-            std::cout << "    \r" << i << std::flush;
+            std::cout << "filePath: " << filePath << "    \r" << i << std::flush;
         }
         i++;
     }
-    std::cout << "\nDuplicated: " << duplicatedCount << std::endl;
+    std::cout << "\nDuplicated: " << duplicatedCount << ", filePath:" << filePath << std::endl;
 
     std::ofstream outFile(outputFileName);
     for (const auto &line : outputLines) {
