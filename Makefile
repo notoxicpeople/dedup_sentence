@@ -23,4 +23,4 @@ simdjson.o: simdjson.cpp simdjson.h
 	$(CXX) $(CXXFLAGS) -c ./simdjson.cpp
 
 clean:
-	rm -f *.o deduplicate
+	rm -f *.o 
