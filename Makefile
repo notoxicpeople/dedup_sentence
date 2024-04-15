@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -Wall -Wextra -I. -pthread
+CXXFLAGS=-std=c++17 -Wall -Wextra -Wno-implicit-fallthrough -I. -pthread
 LDFLAGS=-lstdc++fs -pthread
 
 all: deduplicate clean

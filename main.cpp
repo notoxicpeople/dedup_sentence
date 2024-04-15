@@ -90,6 +90,8 @@ void processFiles(const std::string &inputDir, const std::string &outputDir, int
 
     std::unordered_set<std::string> processedHashes;
     size_t perThread = filePaths.size() / numThreads;
+    std::cout << "\nperThread: " << perThread << ",filePaths:" << filePaths.size() << ",numThreads:" << numThreads << std::endl;
+    
     auto it = filePaths.begin();
 
     for (int i = 0; i < numThreads; ++i) {
