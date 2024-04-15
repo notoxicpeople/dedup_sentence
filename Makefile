@@ -1,16 +1,11 @@
-# LDLIBS = -L/usr/lib/
-# LDHASHER = -L./smhaher
-LDLIBS =
-LDHASHER =
-
 CXX=g++
-CXXFLAGS=-std=c++17 -Wall -Wextra
-LDFLAGS=-lstdc++fs
+CXXFLAGS=-std=c++17 -Wall -Wextra -I. -pthread
+LDFLAGS=-lstdc++fs -pthread
 
 all: deduplicate clean
 
 deduplicate: main.o Hasher.o text.o MurmurHash3.o simdjson.o
-	$(CXX) $(CXXFLAGS) -o deduplicate main.o Hasher.o text.o MurmurHash3.o simdjson.o $(LDFLAGS) $(LDLIBS) $(LDHASHER)
+	$(CXX) $(CXXFLAGS) -o deduplicate main.o Hasher.o text.o MurmurHash3.o simdjson.o $(LDFLAGS) $(LDLIBS)
 
 main.o: main.cpp
 	$(CXX) $(CXXFLAGS) -c main.cpp
@@ -21,11 +16,11 @@ Hasher.o: Hasher.cpp Hasher.hpp
 text.o: text.cpp text.hpp
 	$(CXX) $(CXXFLAGS) -c text.cpp
 
-MurmurHash3.o:
-	$(CXX) -c smhasher/src/MurmurHash3.cpp
+MurmurHash3.o: smhasher/src/MurmurHash3.cpp
+	$(CXX) $(CXXFLAGS) -c smhasher/src/MurmurHash3.cpp
 
 simdjson.o: simdjson.cpp simdjson.h
-	$(CXX) -c ./simdjson.cpp
+	$(CXX) $(CXXFLAGS) -c ./simdjson.cpp
 
 clean:
-	rm -f *.o
+	rm -f *.o deduplicate
