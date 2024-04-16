@@ -11,11 +11,8 @@ https://arxiv.org/abs/2107.06499
 ## 準備
 
 json dump用に`nlohmann/json`を使う。  
-https://github.com/nlohmann/json  
-
-```
-sudo apt install nlohmann-json3-dev
-```
+以下のファイルをnlohmannフォルダ配下に配置する。
+https://github.com/nlohmann/json/blob/develop/include/nlohmann/json.hpp
 
 `simdjson`で高速にjsonlファイルを処理できるらしい
 
@@ -41,7 +38,7 @@ make
 ## run
 
 ```
-./deduplicate {target_dir} {output_dir}
+./deduplicate {target_dir} {output_dir} {num_threads}
 ```
 
 # Lisence
