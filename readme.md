@@ -11,11 +11,10 @@ https://arxiv.org/abs/2107.06499
 ## 準備
 
 json dump用に`nlohmann/json`を使う。  
-以下のファイルをnlohmannフォルダ配下に配置する。
+nlohmannフォルダを作成し、以下のファイルを配下に配置する。  
 https://github.com/nlohmann/json/blob/develop/include/nlohmann/json.hpp
 
-`simdjson`で高速にjsonlファイルを処理できるらしい
-
+`simdjson`で高速にjsonlファイルを処理できるらしい  
 https://github.com/simdjson/simdjson
 
 ```
